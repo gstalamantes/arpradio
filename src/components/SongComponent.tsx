@@ -9,9 +9,9 @@ import Ipi from './ipi';
 interface SongData {
   songTitle?: string;
   audioFile?: File;
-  artists?: string[]; 
-  featured?: string[]; 
-  contArtists?: string[]; 
+  artists?: { [name: string]: { isni: string; links: ArtistLink[] } };
+  featured?: { [name: string]: { isni: string; links: ArtistLink[] } };
+  contArtists?: { [name: string]: { ipn: string; roles: string[] } };
   genres?: string[];
   mood?: string;
   explicit?: boolean;
@@ -23,6 +23,11 @@ interface SongData {
   isrc?: string;
   iswc?: string;
   authors?: Author[];
+}
+
+interface ArtistLink {
+  name: string;
+  url: string;
 }
 
 interface Author {
@@ -79,9 +84,15 @@ const SongComponent: React.FC<SongComponentProps> = ({ id, index, onSongDataChan
 
       <div style={{ display: isVisible ? 'block' : 'none' }}>
         <AudioInput onAudioChange={(file: File) => handleChange('audioFile', file)} />
-        <ArtistsForm onArtistsChange={(newArtists: any[]) => handleChange('artists', newArtists)} />
-        <Featured onArtistsChange={(newFeatured: any[]) => handleChange('featured', newFeatured)} />
-        <ContArtistsForm onArtistsChange={(newContArtists: any[]) => handleChange('contArtists', newContArtists)} />
+        <ArtistsForm onArtistsChange={(newArtists: { [name: string]: { isni: string; links: ArtistLink[] } }) => {
+  handleChange('artists', Object.keys(newArtists));
+}} />
+        <Featured onArtistsChange={(newFeatured: { [name: string]: { isni: string; links: ArtistLink[] } }) => {
+  handleChange('featured', Object.keys(newFeatured));
+}} />
+      <ContArtistsForm onArtistsChange={(newContArtists: { [name: string]: { ipn: string; roles: string[] } }) => {
+  handleChange('contArtists', Object.keys(newContArtists));
+}} />
         <Genre onGenreChange={(genreData: GenreData) => {
           handleChange('genres', genreData.genres);
           handleChange('mood', genreData.mood);
