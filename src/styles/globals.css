@@ -48,11 +48,20 @@
   src: url('/fonts/arcade.ttf');
 }
 
+
+
 html{
   background: url("/bg2.png");
   background-position: left;
   color: white;
   overflow: hidden;
+}
+
+button{
+max-width: 190px;
+text-align: center;
+
+
 }
 
 .formHead{
@@ -277,9 +286,8 @@ input[type="range"]::-ms-thumb{
   }
 
 #foot{
-    background-image: linear-gradient(rgba(0, 0, 0, 0.92), rgba(32, 51, 145, 0.86), rgb(20, 20, 197), black);
-    position: sticky;
-    bottom:15px
+    background-image: linear-gradient(rgba(0, 0, 0, 0.92), rgba(32, 51, 145, 0.96), rgb(20, 20, 197), black);
+    
   }
   
 @keyframes blink {

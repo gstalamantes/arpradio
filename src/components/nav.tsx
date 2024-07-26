@@ -104,7 +104,7 @@ return (
                  <div className="text-center mb-4">
                 
                 <CardanoWallet onConnected={() => {}} isDark label="Wallet" /></div>
-                <Link className="md:hidden underline  text-xs w-36 text-amber-200" href="https://flint-wallet.app.link/browse?dappUrl=https%3A%2F%2Farpradio.media">Access wallet on mobile using Flint.</Link> 
+                <Link className="md:hidden underline  text-2xs w-36 text-amber-200" href="https://flint-wallet.app.link/browse?dappUrl=https%3A%2F%2Farpradio.media">Access wallet on mobile using Flint.</Link> 
             </div>
     
             <div id="navlinks" className="text-center m-auto text-cyan-400 py-1 bg-neutral-800   px-4 md:px-8  rounded md:hidden border-2">

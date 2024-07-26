@@ -105,10 +105,10 @@ export function Controls() {
   };
 
   return (
-   <div id="foot" className="border-2  flex max-w-[700px] h-42 w-full md:w-3/5 m-12 rounded-xl   mx-auto mt-auto text-center">
+   <div id="foot" className="border-2 sticky bottom-[28px] flex max-w-[700px] h-42 w-full md:w-3/5 m-12 rounded-xl   mx-auto mt-auto text-center">
       
-      <div className="w-24 "></div>
-      <div className="ml-auto">
+      
+      <div className="mx-auto">
       <Audio songUrl={songs[index]?.url || ""} onNext={next} />
         <h2>Playlist</h2>
         <select id="playlist" className="m-auto block text-black  rounded-full mb-4 border-4 border-cyan-600 text-center" onChange={(event) => handlePlaylistChange(event)} value={selectedPlaylist}>
@@ -124,7 +124,7 @@ export function Controls() {
     
       </div>
      
-      <div className=" w-fit ml-auto mr-5 my-auto " > <Volume/></div> 
+      <div className="absolute right-0 md:right-4 w-fit ml-auto my-1 " > <Volume/></div> 
     </div>
   );
 }

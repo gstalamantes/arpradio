@@ -41,7 +41,7 @@ export function Volume() {
   return (
     <div className=" w-fit h-fit  rounded-2xl">
      
-      <div className="p-1 rounded-2xl h-fit bg-neutral-800/20 border-2 border-neutral-500/50 text-xs text-center">
+      <div className="p-1 rounded-2xl h-fit bg-black/30 border-2 border-neutral-500/50 text-xs text-center">
         <div
           id="mute"
           onClick={mute}
