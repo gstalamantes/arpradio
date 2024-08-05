@@ -7,7 +7,17 @@ interface AudioProps {
   onNext: () => void;
 }
 
-const Modal: React.FC<{ show: boolean; message: string }> = ({ show, message }) => {
+const Modal: React.FC<{ show: boolean; message: string; onClose: () => void }> = ({ show, message, onClose }) => {
+  useEffect(() => {
+    if (show) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [show, onClose]);
+
   if (!show) return null;
 
   return (
@@ -25,6 +35,10 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const abortControllerRef = useRef(new AbortController());
   const previousSongUrlRef = useRef(songUrl);
+
+  const clearError = () => {
+    setErrorMessage('');
+  };
 
   useEffect(() => {
     let isCancelled = false;
@@ -55,6 +69,13 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
       }
     };
 
+    const setErrorWithTimeout = (message: string) => {
+      setErrorMessage(message);
+      setTimeout(() => {
+        setErrorMessage('');
+      }, 1500);
+    };
+
     const fetchAudio = async () => {
       const audioElement = document.getElementById('audio') as HTMLAudioElement | null;
       if (!audioElement || !songUrl) return;
@@ -75,7 +96,6 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
       if (songUrl.startsWith('https://ipfs.io/ipfs/')) { 
         const cid = songUrl.slice(21);
         
-        // Call the new API route for local IPFS fetch
         try {
           const apiResponse = await fetch(`/api/ipfsLocal?cid=${cid}`, {
             signal: abortControllerRef.current.signal
@@ -94,7 +114,7 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
       } else if (!songUrl.startsWith('https://ipfs.io/ipfs/')) {
         fetchUrls = [songUrl];
       } else {
-        setErrorMessage('Unsupported URL format');
+        setErrorWithTimeout('Unsupported URL format');
         setIsLoading(false);
         return;
       }
@@ -121,7 +141,7 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
       if (isCancelled) return;
 
       if (!response || !response.ok) {
-        setErrorMessage('Failed to load audio. Please try again.');
+        setErrorWithTimeout('Failed to load audio. Please try again.');
         setIsLoading(false);
         onNext(); 
         return;
@@ -134,17 +154,18 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
         audioElement.oncanplay = () => {
           audioElement.play().catch(playError => {
             console.error('Audio playback error:', playError);
-            setErrorMessage('Playback failed. Please try again.');
+            setErrorWithTimeout('Playback failed. Please try again.');
           });
         };
 
         audioElement.onerror = (event) => {
           console.error('Audio error:', event);
-          setErrorMessage('Audio failed to load. Please try again.');
+          setErrorWithTimeout('Audio failed to load. Please try again.');
         };
       } catch (error) {
         console.error('Error setting up audio:', error);
-        setErrorMessage('Failed to set up audio. Please try again.');
+        setErrorWithTimeout('Failed to set up audio. Please try again.');
+        
       } finally {
         if (!isCancelled) {
           setIsLoading(false);
@@ -162,7 +183,11 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
 
   return (
     <>
-      <Modal show={isLoading || !!errorMessage} message={errorMessage || 'Loading...'} />
+      <Modal 
+        show={isLoading || !!errorMessage} 
+        message={errorMessage || 'Loading...'} 
+        onClose={clearError}
+      />
       <audio preload="auto" id="audio"></audio>
     </>
   );

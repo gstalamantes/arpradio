@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { createVerifiedFetch } from '@helia/verified-fetch';
+import { createVerifiedFetch, VerifiedFetch } from '@helia/verified-fetch';
 import Image from 'next/image';
 
 interface ArtProps {
@@ -22,7 +22,7 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
   useEffect(() => {
     let isCancelled = false;
 
-    const fetchWithTimeout = async (url: string, options: RequestInit, timeout: number = 15000) => {
+    const fetchWithTimeout = async (url: string, options: RequestInit, timeout: number = 15000): Promise<Response> => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
 
@@ -44,6 +44,7 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
         const response = await fetch(`/api/ipfsLocal?cid=${cid}`, { 
           signal: abortControllerRef.current.signal 
         });
+        console.log('Image')
         if (response.ok) {
           console.log("Local IPFS fetch succeeded for CID:", cid);
           return response;
@@ -57,13 +58,11 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
       }
     };
 
-    const tryFetch = async (url: string): Promise<Response> => {
-      try {
-        return await fetchWithTimeout(url, { signal: abortControllerRef.current.signal });
-      } catch (error) {
-        console.error(`Fetch failed for ${url}:`, error);
-        throw error;
-      }
+    const fetchParallel = async (fetchFunctions: (() => Promise<Response | null>)[]): Promise<Response> => {
+      const responses = await Promise.all(fetchFunctions.map(fn => fn().catch(() => null)));
+      const successfulResponse = responses.find(r => r && r.ok);
+      if (successfulResponse) return successfulResponse;
+      throw new Error('All fetches failed');
     };
 
     const fetchImage = async () => {
@@ -76,21 +75,27 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
       setImageLoaded(false);
 
       let response: Response | null = null;
-      let fetchUrls: string[] = [];
+      let fetchFunctions: (() => Promise<Response | null>)[] = [];
 
       if (imageUrl.startsWith('ipfs://')) {
         const cid = imageUrl.slice(7);
         
         response = await tryLocalFetch(cid);
 
-        if (response) {
-          console.log(`Image fetched from local IPFS for URL: ${imageUrl}`);
-        } else {
+        if (!response) {
           console.log(`Local fetch failed, trying other methods for URL: ${imageUrl}`);
-          fetchUrls = [`https://ipfs.io/ipfs/${cid}`, `https://arpradio.media/ipfs/${cid}`];
+          const urls = [
+            `https://ipfs.io/ipfs/${cid}`, 
+            `https://arpradio.media/ipfs/${cid}`
+          ];
+          fetchFunctions = urls.map(url => () => fetchWithTimeout(url, { signal: abortControllerRef.current.signal }));
+          
+          // Add verified fetch for the original ipfs:// URL
+          const verifiedFetch = await createVerifiedFetch();
+          fetchFunctions.push(() => verifiedFetch(imageUrl, { signal: abortControllerRef.current.signal }));
         }
       } else if (imageUrl.startsWith('https://')) {
-        fetchUrls = [imageUrl];
+        fetchFunctions = [() => fetchWithTimeout(imageUrl, { signal: abortControllerRef.current.signal })];
       } else {
         console.error('Unsupported URL format');
         setFetchedImageSrc('/default.png');
@@ -99,22 +104,11 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
         return;
       }
 
-      if (!response) {
-        for (const url of fetchUrls) {
-          if (isCancelled) return;
-
-          try {
-            if (url === imageUrl && imageUrl.startsWith('ipfs://')) {
-              const verifiedFetch = await createVerifiedFetch();
-              response = await verifiedFetch(url, { signal: abortControllerRef.current.signal });
-            } else {
-              response = await tryFetch(url);
-            }
-
-            if (response.ok) break;
-          } catch (error) {
-            console.error(`Fetch failed for ${url}:`, error);
-          }
+      if (!response && fetchFunctions.length > 0) {
+        try {
+          response = await fetchParallel(fetchFunctions);
+        } catch (error) {
+          console.error('All fetch attempts failed:', error);
         }
       }
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
-import Audio from "./ipfsCat";
+import Audio from "./audioFetch";
 import { Volume } from "@/components/volume";
 import { useSongs } from "./songs";
 import SongNavigation from "./songNav";
