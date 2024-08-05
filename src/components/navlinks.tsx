@@ -16,7 +16,7 @@ export function NavLinks(){
                 </Link>
            ))}
            <a href="/form" target="_blank" rel="noopener noreferrer">
-                Submit
+                Mint
            </a>
         </div>
     )
