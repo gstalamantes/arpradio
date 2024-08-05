@@ -54,7 +54,7 @@ html{
   background: url("/bg2.png");
   background-position: left;
   color: white;
-  overflow: hidden;
+  overflow: auto;
 }
 
 button{
