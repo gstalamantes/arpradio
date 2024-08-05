@@ -1,47 +1,41 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { create } from 'ipfs-http-client';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { cid } = req.query
-
-  if (!cid || typeof cid !== 'string') {
-    return res.status(400).json({ error: 'Invalid CID' })
-  }
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000); 
-
-  try {
-    const localUrl = `http://localhost:9095/ipfs/${cid}`
-    const response = await fetch(localUrl, { 
-      signal: controller.signal 
-    });
-
-    clearTimeout(timeoutId);
-
-  if (response.ok) {
-  console.log("Local IPFS Provider succeeded for CID:", cid);
-  res.setHeader('X-Local-Fetch', 'success');
+export const config = {
+  api: {
+    responseLimit: '38mb',
+  },
 }
 
-    if (!response.ok) {
-      throw new Error('Local fetch failed')
-    }
+const ipfs = create({ url: 'http://localhost:9095' });
 
-    const data = await response.arrayBuffer()
-    res.setHeader('Content-Type', response.headers.get('Content-Type') || 'application/octet-stream')
-    res.send(Buffer.from(data))
-  } catch (error: unknown) {
-    clearTimeout(timeoutId);
-    console.error('Error fetching from local IPFS:', error)
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  console.log('API route called with query:', req.query);
+  
+  const { cid } = req.query;
 
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        res.status(504).json({ error: 'Local IPFS fetch timed out' })
-      } else {
-        res.status(502).json({ error: 'Failed to fetch from local IPFS' })
-      }
-    } else {
-      res.status(500).json({ error: 'An unexpected error occurred' })
+  if (typeof cid !== 'string') {
+    console.log('Invalid CID:', cid);
+    return res.status(400).json({ error: 'Invalid CID' });
+  }
+
+  try {
+    console.log(`Attempting to fetch from IPFS with CID: ${cid}`);
+    
+    const chunks = [];
+    for await (const chunk of ipfs.cat(cid)) {
+      chunks.push(chunk);
     }
+    
+    const fileContent = Buffer.concat(chunks);
+
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Length', fileContent.length);
+
+    res.send(fileContent);
+
+  } catch (error) {
+    console.log('Trying fetch via public gateway');
+    res.status(404).end(); 
   }
 }

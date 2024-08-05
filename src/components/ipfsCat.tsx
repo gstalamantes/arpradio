@@ -46,20 +46,6 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
       }
     };
 
-    const tryLocalFetch = async (cid: string): Promise<Response | null> => {
-      try {
-        const response = await fetch(`/api/fetch-ipfs?cid=${cid}`, { 
-          signal: abortControllerRef.current.signal 
-        });
-        if (response.ok) {
-          return response;
-        }
-      } catch (error) {
-        console.error('Local IPFS API fetch failed:', error);
-      }
-      return null;
-    };
-
     const tryFetch = async (url: string): Promise<Response> => {
       try {
         return await fetchWithTimeout(url, { signal: abortControllerRef.current.signal });
@@ -86,18 +72,26 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
       let response: Response | null = null;
       let fetchUrls: string[] = [];
 
-      if (songUrl.startsWith('ipfs://')) {
-        const cid = songUrl.slice(7);
+      if (songUrl.startsWith('https://ipfs.io/ipfs/')) { 
+        const cid = songUrl.slice(21);
         
-    
-        response = await tryLocalFetch(cid);
+        // Call the new API route for local IPFS fetch
+        try {
+          const apiResponse = await fetch(`/api/ipfsLocal?cid=${cid}`, {
+            signal: abortControllerRef.current.signal
+          });
+          if (apiResponse.ok) {
+            response = apiResponse;
+          }
+        } catch (error) {
+          console.error('API call for local IPFS fetch failed:', error);
+        }
         
         if (!response) {
-       
           const directUrl = `https://ipfs.io/ipfs/${cid}`;
           fetchUrls = [songUrl, directUrl, cid];
         }
-      } else if (songUrl.startsWith('https://')) {
+      } else if (!songUrl.startsWith('https://ipfs.io/ipfs/')) {
         fetchUrls = [songUrl];
       } else {
         setErrorMessage('Unsupported URL format');
@@ -105,16 +99,13 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
         return;
       }
 
-  
       if (!response) {
         for (const url of fetchUrls) {
           if (isCancelled) return;
 
           try {
             if (url === songUrl && songUrl.startsWith('ipfs://')) {
-              const verifiedFetch = await createVerifiedFetch(
-            
-              );
+              const verifiedFetch = await createVerifiedFetch();
               response = await verifiedFetch(url, { signal: abortControllerRef.current.signal });
             } else {
               response = await tryFetch(url);
@@ -132,7 +123,6 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
       if (!response || !response.ok) {
         setErrorMessage('Failed to load audio. Please try again.');
         setIsLoading(false);
-        
         onNext(); 
         return;
       }
@@ -168,7 +158,7 @@ const Audio: React.FC<AudioProps> = ({ songUrl, onNext }) => {
       isCancelled = true;
       abortControllerRef.current.abort(); 
     };
-  }, [songUrl]);
+  }, [songUrl, onNext]);
 
   return (
     <>

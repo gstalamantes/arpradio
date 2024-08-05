@@ -1,22 +1,23 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createVerifiedFetch } from '@helia/verified-fetch';
 import Image from 'next/image';
-import Modal from "react-modal";
 
 interface ArtProps {
   imageUrl: string;
+}
+
+export const config = {
+  api: {
+    responseLimit: '8mb',
+  },
 }
 
 const Art: React.FC<ArtProps> = ({ imageUrl }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [fetchedImageSrc, setFetchedImageSrc] = useState('');
   const [fetching, setFetching] = useState(false);
-  const [showLinks, setShowLinks] = useState<boolean>(false);
   const abortControllerRef = useRef(new AbortController());
   const previousImageUrlRef = useRef(imageUrl);
-
-  const links = () => setShowLinks(true);
-  const closeLinks = () => setShowLinks(false);
 
   useEffect(() => {
     let isCancelled = false;
@@ -40,23 +41,21 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
 
     const tryLocalFetch = async (cid: string): Promise<Response | null> => {
       try {
-        const response = await fetch(`/api/fetch-ipfs?cid=${cid}`, { 
+        const response = await fetch(`/api/ipfsLocal?cid=${cid}`, { 
           signal: abortControllerRef.current.signal 
         });
         if (response.ok) {
-          const isLocalFetch = response.headers.get('X-Local-Fetch') === 'success';
-          if (isLocalFetch) {
-            console.log(`Local IPFS fetch succeeded for CID: ${cid}`);
-          }
+          console.log("Local IPFS fetch succeeded for CID:", cid);
           return response;
+        } else {
+          console.log("Local IPFS fetch failed, status:", response.status);
+          return null;
         }
       } catch (error) {
         console.error('Local IPFS API fetch failed:', error);
+        return null;
       }
-      return null;
     };
-
-    
 
     const tryFetch = async (url: string): Promise<Response> => {
       try {
@@ -82,23 +81,13 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
       if (imageUrl.startsWith('ipfs://')) {
         const cid = imageUrl.slice(7);
         
-       
         response = await tryLocalFetch(cid);
 
         if (response) {
           console.log(`Image fetched from local IPFS for URL: ${imageUrl}`);
         } else {
           console.log(`Local fetch failed, trying other methods for URL: ${imageUrl}`);
-        }
-        
-        // After the for loop that tries other fetch methods:
-        if (response && response.ok) {
-          console.log(`Image fetched using ${response.url.startsWith('https://ipfs.io') ? 'IPFS gateway' : 'verified fetch'} for URL: ${imageUrl}`);
-        }
-        
-        if (!response) {
-
-          fetchUrls = [imageUrl, `https://arpradio.media/ipfs/${cid}`];
+          fetchUrls = [`https://ipfs.io/ipfs/${cid}`, `https://arpradio.media/ipfs/${cid}`];
         }
       } else if (imageUrl.startsWith('https://')) {
         fetchUrls = [imageUrl];
@@ -110,16 +99,13 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
         return;
       }
 
-      
       if (!response) {
         for (const url of fetchUrls) {
           if (isCancelled) return;
 
           try {
             if (url === imageUrl && imageUrl.startsWith('ipfs://')) {
-              const verifiedFetch = await createVerifiedFetch(
-          
-              );
+              const verifiedFetch = await createVerifiedFetch();
               response = await verifiedFetch(url, { signal: abortControllerRef.current.signal });
             } else {
               response = await tryFetch(url);
@@ -167,16 +153,7 @@ const Art: React.FC<ArtProps> = ({ imageUrl }) => {
   }, [imageUrl]);
 
   return (
-    <div className="flex size-fit m-auto" onMouseEnter={links} onMouseLeave={closeLinks}>
-      <Modal
-        className="h-[400px] w-[260px] left-2/4 mr-[300px] rounded-lg top-1/2 border-2 border-neutral-500 -mt-[200px] bg-blue-800/80 fixed"
-        overlayClassName="bg-transparent"
-        isOpen={showLinks}
-      >
-        <div onMouseLeave={closeLinks} className="size-full text-center">
-          Links
-        </div>
-      </Modal>
+    <div className="flex size-fit m-auto" >
       <Image
         height={100}
         width={100}
