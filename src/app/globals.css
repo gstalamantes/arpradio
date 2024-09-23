@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'russ';
+  src: url('/fonts/russ.ttf');
+}
+
+@font-face {
+  font-family: 'impact';
+  src: url('/fonts/impact.ttf');
+}
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+#container{
+  background-image: url("/bg2.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position-x: center ;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color:black ;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+ .control{
+  cursor: pointer;
+  margin: 0 5px
+ }
+
+input{
+width: 50%;
+border-radius: 4px;
+color:black;
+text-align: center;
+margin: 5px;
+align-content: end;
+
+right: 5px;
+border-color: rgb(75, 75, 75);
+border-width: 2px;
+}
+
+.formSelect{
+  height: 21px;
+  color: black;
+  align-self: center;
+  width: 50%;
+  border-radius: 2px;
+  text-align: center;
+}
+
+.inputForm, .formOption, .formSelect{
+  background-color: rgba(255, 255, 255, 0.819);
+  color:black
+}
+ .formInputs h1{
+  color:yellow
+ }
+
+ .formInputs input{
+ 
+  color: black;
+ }
+
+
+
+
+.formInput, .formInput button{
+  display: flex;
+  background-color: rgba(240, 248, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.497);
+  border-width: 1px;
+  border-radius: 4px;
+ padding: 2px;
+
+  font-size: smaller;
+  max-width: 80svw;
+  margin: 10px;
+  align-items: center;
+  
+
+}
+
+label{
+  margin-left: 10px;
+margin-right: auto;
+align-content: center;
+text-align: end;}
+
+#radio{
+  font-family: impact;
+  color: rgb(181, 179, 179);
+  text-shadow: 0px 1px 0px rgba(255, 2, 2, 0.333);
+}
+
+.nav{
+  font-family: "russ";
+  text-shadow: 1px 1px 1px   black;
+}
+
+h1{
+  font-family: "russ";
+}
+
+ h2{
+margin: 2px 2px 6px
+ }
+
+ label.formLabel{
+
+color:rgb(123, 123, 14);
+font-size:small
+ }
