@@ -174,7 +174,7 @@ export default function Single() {
           "image": `ipfs://${imageCid}`,
           "music_metadata_version": "3",
           "licensing": "For Promotional and Listening purposes only.",
-          "agreement": "ipfs://",
+          "agreement": "ipfs://QmcXRd2Hi3rwGvqpj7xjnBMgHUW2bTuLu6z6kR8fnQXhzk",
           "release": {
             "release_type": "Single",
             "release_title": formData.releaseName,

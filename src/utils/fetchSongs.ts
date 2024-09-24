@@ -1,4 +1,3 @@
-
 "use server"
 import mysql from 'mysql2/promise';
 
@@ -46,12 +45,12 @@ export async function fetchSongs(searchTerm: string = '', genre: string = '', ar
       const whereConditions = [];
 
       if (searchTerm) {
-        whereConditions.push('artist LIKE ?');
+        whereConditions.push('LOWER(artist) LIKE LOWER(?)');
         params.push(`%${searchTerm}%`);
       }
 
       if (genre) {
-        whereConditions.push('(genre LIKE ? OR sub_genre LIKE ?)');
+        whereConditions.push('(LOWER(genre) LIKE LOWER(?) OR LOWER(sub_genre) LIKE LOWER(?))');
         params.push(`%${genre}%`, `%${genre}%`);
       }
 
@@ -64,7 +63,7 @@ export async function fetchSongs(searchTerm: string = '', genre: string = '', ar
       query = `SELECT * FROM ${db}.cip60`;
 
       if (searchTerm) {
-        query += ' WHERE metadata LIKE ? or name LIKE ?';
+        query += ' WHERE LOWER(metadata) LIKE LOWER(?) OR LOWER(name) LIKE LOWER(?)';
         params.push(`%${searchTerm}%`, `%${searchTerm}%`);
       }
 

@@ -21,7 +21,7 @@ export const MeshProviderApp = ({ children }: { children: React.ReactNode }) => 
   
     return <section className="w-full h-screen justify-center  "> 
 
-      <div className="w-full absolute"><Image className="mx-auto w-auto h-auto" src="/radio.svg" width={200} height={200} alt="Arp Radio" /></div>
+      <div className="w-full absolute"><Image className="mx-auto p-4 h-64 " src="/radio.svg" width={150} height={150} alt="Arp Radio" /></div>
     <div className="flex flex-col items-center justify-center h-full">  
      <Image className="m-2" src="/album.gif" alt="Loading" width={150} height={150}></Image>
       <h1>Loading...</h1>

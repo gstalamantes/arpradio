@@ -83,7 +83,7 @@ export default function SearchableResults({
   return (
     <>
       <form className="flex ml-auto mr-4 w-fit" action={handleSearch}>
-        <div className="flex h-fit justify-evenly  ">
+        <div className="md:flex h-fit justify-between  ">
           <div className="w-36 flex">
             <label className="text-[.4rem] md:text-xs w-fit">Arp Songs Only</label>
             <input

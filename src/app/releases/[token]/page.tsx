@@ -12,14 +12,12 @@ export default async function Token({ params, searchParams }: { params: { token:
         <h1 className="font-bold text-xl mt-4 mb-1 md:text-2xl">{releaseTitle || songTitles}</h1>
    
         <Link href={`https://cexplorer.io/asset/${params.token}/metadata#data`} target="_blank">
-            {imageUrl ? (
+        
               <Art imageUrl={imageUrl} width={200} height={200} />
-            ) : (
-              <Art imageUrl="/album.gif" width={200} height={200} />
-            )}
+        
             <h2 className="text-xs text-zinc-400 mb-2">Policy ID: {policy_id}</h2>
         </Link>
-        <div className="max-h-[45dvh] h-fit flex flex-col overflow-y-auto w-full items-center">
+        <div id="metadata" className="max-h-[45dvh] h-fit flex flex-col overflow-y-auto w-full items-center">
           <div className="w-full overflow-y-auto h-[40dvh]">
             <h2 className="mb-2">Release Type: {releaseType}</h2>
             {artists && artists.length > 0 && (
@@ -52,7 +50,7 @@ export default async function Token({ params, searchParams }: { params: { token:
             )}
             
             {songTitles && songTitles.length > 0 && (
-              <div className="mt-4">
+              <div id="songTitle" className="mt-4 w-fit mx-auto">
                 <h3 className="font-bold">Song Titles:</h3>
                 <ul className="list-disc list-inside">
                   {songTitles.map((title, index) => (

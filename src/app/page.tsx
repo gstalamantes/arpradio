@@ -32,7 +32,7 @@ export default async function Home() {
         <Link href="https://newm.io/" target="_blank" title="Newm"><Image className="mx-4" src="/newm.png" width={100} height={100} alt="Newm" /></Link>
         <Link href="https://soundrig.io/" target="_blank" title="SoundRig"><Image className="mx-4" src="/soundrig.webp" width={100} height={100} alt="SoundRig" /></Link>
         </div> 
-        <div   className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex items-center justify-between">
         <Link href="https://www.youtube.com/@solittyrecords" target="_blank" title="So Litty Records"><Image className="h-12 w-auto mx-4" src="/slr.png" width={100} height={100} alt="So Litty Records" /></Link>
         <Link href="https://sickcity.xyz" target="_blank" title="Sick City"><Image className="mx-4 h-auto w-24" src="/sick-city.webp" width={100} height={100} alt="Sick City" /></Link>
         <Link href="https://sync.land" target="_blank" title="SyncLand"><Image className="mx-4 h-auto w-14" src="/syncland.png" width={100} height={100} alt="SyncLand" /></Link>
