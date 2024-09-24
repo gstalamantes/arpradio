@@ -12,9 +12,11 @@ export default async function Token({ params, searchParams }: { params: { token:
         <h1 className="font-bold text-xl mt-4 mb-1 md:text-2xl">{releaseTitle || songTitles}</h1>
    
         <Link href={`https://cexplorer.io/asset/${params.token}/metadata#data`} target="_blank">
-        
+            {imageUrl ? (
               <Art imageUrl={imageUrl} width={200} height={200} />
-        
+            ) : (
+              <Art imageUrl="/album.gif" width={200} height={200} />
+            )}
             <h2 className="text-xs text-zinc-400 mb-2">Policy ID: {policy_id}</h2>
         </Link>
         <div id="metadata" className="max-h-[45dvh] h-fit flex flex-col overflow-y-auto w-full items-center">
