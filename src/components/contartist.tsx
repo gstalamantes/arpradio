@@ -106,7 +106,7 @@ const ContArtistsForm: React.FC<ContArtistsFormProps> = ({ onArtistsChange }) =>
   };
 
   return (
-    <div className="text-zinc-300 mb-4">
+    <div className="text-zinc-300 mb-4 w-full">
       <h1>Contributing Artists:</h1>
       <h2 className="font-mono text-sm text-zinc-500" title="Here you can list all artists that will be credited as a performing contributor to the song. In the case of a band, you can list the contributing members of the song here. If available, input the IPN or IPI of each performer. These artists will not be listed in the Artist field, but are credited and can be tracked in the metadata of the token.">
         List Contributing Artists along with their according IPN or IPI, if available.

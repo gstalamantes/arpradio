@@ -6,7 +6,7 @@ export default function Mint() {
     <section className="flex h-[80svh] items-center bg-black/70 justify-center text-center">
       <div className="mx-auto ">
         <h3 className="text-xs">* Denotes a required field.</h3>
-        <Single />
+       <div className="w-full mx-auto"> <Single /></div>
       </div>
     </section>
   );

@@ -5,7 +5,7 @@ import ArtistsForm from './artistIsni';
 import ContArtistsForm, { FormattedContributingArtist } from './contartist';
 import Featured from './feature';
 import { useWallet } from '@meshsdk/react';
-import { Mint, ForgeScript, AssetMetadata, Transaction } from '@meshsdk/core';
+import { Mint, ForgeScript, AssetMetadata, Transaction, Integer } from '@meshsdk/core';
 import { uploadToIpfs, pinFiles } from '../actions/ipfs';  
 
 interface FormattedArtist {
@@ -32,6 +32,7 @@ interface FormData {
   iswc?: string;
   compCopyright: string;
   masterCopyright: string;
+  quantity: number
 }
 
 
@@ -83,6 +84,7 @@ export default function Single() {
     iswc: '',
     compCopyright: '',
     masterCopyright: '',
+    quantity: 1
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -106,10 +108,12 @@ export default function Single() {
       return () => URL.revokeObjectURL(audioUrl);
     }
   }, [formData.songFile]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: name === 'quantity' ? parseInt(value, 10) : value 
+    }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,6 +173,8 @@ export default function Single() {
           "name": formData.assetName,
           "image": `ipfs://${imageCid}`,
           "music_metadata_version": "3",
+          "licensing": "For Promotional and Listening purposes only.",
+          "agreement": "ipfs://",
           "release": {
             "release_type": "Single",
             "release_title": formData.releaseName,
@@ -209,8 +215,8 @@ export default function Single() {
         const cleanedAssetMetadata = cleanObject(rawAssetMetadata);
 
         const asset: Mint = {
-          assetName: `Arp-${formData.assetName}`,
-          assetQuantity: "1",
+          assetName: `ArpRadio-${formData.assetName}`,
+          assetQuantity: `${formData.quantity}`,
           metadata: cleanedAssetMetadata,
           label: "721",
           recipient: address,
@@ -226,7 +232,7 @@ export default function Single() {
         const signedTx = await wallet.signTx(unsignedTx);
         const txHash = await wallet.submitTx(signedTx);
 
-        const cidsToPin = [imageCid, songCid].filter(cid => cid !== '');
+     const cidsToPin = [imageCid, songCid].filter(cid => cid !== '');
         const pinResult = await pinFiles(cidsToPin);
 
         if (pinResult.success) {
@@ -245,8 +251,8 @@ export default function Single() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-black text-black rounded-xl border-zinc-500 border-[1px] px-4 py-2 w-full mx-auto h-[70dvh]">
-      <div className="max-h-[65dvh] w-[65dvh] mx-auto overflow-y-auto">
+    <form onSubmit={handleSubmit} className="bg-black text-black rounded-xl border-zinc-500 border-[1px] p-2 w-full justify-center mx-auto h-full">
+      <div className="max-h-[55dvh] w-full mx-auto overflow-y-auto">
         <div className="formInput">
           <label className="formLabel">*Asset Name:</label>
           <input className="inputForm" name="assetName" type="text" value={formData.assetName} onChange={handleInputChange} title="The Asset Name, along with the Policy ID, uniquely identifies a token." required />
@@ -333,6 +339,18 @@ export default function Single() {
             required
           />
         </div>
+        <div className="formInput">
+  <label className="formLabel">Token Mint Quantity:</label>
+  <input 
+    className="inputForm w-[6rem] mx-auto"
+    type="number" 
+    name="quantity" 
+    min="1" 
+    value={formData.quantity} 
+    onChange={handleInputChange}
+    required
+  />
+</div>
         <ArtistsForm onArtistsChange={handleArtistsChange} />
         <Featured onArtistsChange={handleFeaturedArtistsChange} />
         <ContArtistsForm onArtistsChange={handleContributingArtistsChange} />

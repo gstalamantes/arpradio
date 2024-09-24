@@ -97,7 +97,7 @@ const Featured: React.FC<FeaturedProps> = ({ onArtistsChange }) => {
   };
 
   return (
-    <div className="mb-4 text-zinc-300">
+    <div className="w-full mb-4 text-zinc-300">
       <h1>Featured Artist:</h1>
       <h2 className="font-mono text-zinc-500 text-sm" title="Featured Artists are typically displayed along with the Artist in most players. Input any artist features here">
         Add the featured artist here.

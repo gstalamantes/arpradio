@@ -96,7 +96,7 @@ const ArtistsForm: React.FC<ArtistsFormProps> = ({ onArtistsChange }) => {
   };
 
   return (
-    <div className="text-zinc-300 mb-4" >
+    <div className="text-zinc-300 mb-4 w-full" >
       <h1>Artists:</h1>
       <h2 className="m-2 font-mono text-zinc-500 text-sm" title="This in most cases will be a single entity, like a band or songwriter/performer. For proper record keeping, multiple values are accepted, but should be kept minimal. Band members and contributors can be credited in the Contributing Artist field.">
         Add the primary Artist here and artist&apos;s ISNI, if available, to avoid name conflicts.
